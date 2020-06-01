@@ -1,0 +1,135 @@
+#include <stdio.h>
+
+struct ITEM // Armazenar dados relacionados aos Itens
+{
+char D[15], UM[3]; // Descrição do Item, Unidade de Medida do Item
+double Q, VU; // Quantidade de Unidades do Item, Valor Unitário do Item
+};
+
+struct CATEGORIA // Armazenar dados relacionados às Categorias
+{
+	int NI; // Número de Itens na Categoria
+	char NC[25]; // Nome da Categoria
+	double VT; // Valor Total da Categoria
+
+	struct ITEM itens[99]; // Relação entre as duas structs
+};
+
+int main(void)
+{
+	struct CATEGORIA categoria[99]; // Indicação de inicio do uso da struct
+	int VP=0, TI=0, NuC=0, cc=0, ci=0; // Valor das Parcelas, Total de Itens, Número de Categorias, Variável Controle de Categoria, Variável Controle de Itens
+	double VM=0, VT=0, VD=0; // Valor Mínimo, Valor Total, Valor do Desconto
+	char RST[3], RS[3]="R$", FP[1];  // R$, Forma de Pagamento
+
+	scanf("%d", &NuC); // Atribuir valor de Número de Categorias
+	if (NuC<=0 || NuC>=100) // Número de categorias não pode ser menor do que 0 ou maior do que 100
+	{
+		printf("Quantidade de categorias inválida.\n");
+		return 0;
+	}
+	while (cc<NuC) // Repetirá enquanto a Variável de Controle de Categoria for menor ao próprio Número de Categorias
+	{
+		fflush(stdin); // Limpa a entrada
+		scanf("%25s %d", categoria[cc].NC, &categoria[cc].NI); // Atribui Nome na Categoria e sua Quantidade de Itens
+		if(categoria[cc].NI<=0 || categoria[cc].NI>=100)
+		{
+			printf("Quantidade de itens inválida.\n");
+			return 0;
+		}
+		while (ci < categoria[cc].NI) // Repetirá enquanto a Variável Controle de Itens for menor ao próprio Número de Itens de cada Categoria
+		{
+			fflush(stdin); // Limpa a entrada
+			scanf("%15s %lf %3s %2s %lf", categoria[cc].itens[ci].D, &categoria[cc].itens[ci].Q, categoria[cc].itens[ci].UM, RST, &categoria[cc].itens[ci].VU); // Aatribui Descrição, Quantidade, Unidade de Medida e Valor Unitário dos Itens e Unidade Monetária(R$)
+			if (categoria[cc].itens[ci].Q<=0 || categoria[cc].itens[ci].Q>=100) 
+			{
+				printf("Quantidade inválida.\n");
+				return 0;
+			}
+			else if (categoria[cc].itens[ci].VU<0 || categoria[cc].itens[ci].VU>=100)
+			{
+				printf("Valor unitário inválido.\n");
+				return 0;
+			}
+			else if (RST[2]!=RS[2])
+			{
+				printf("Unidade moneária inválida.\n"); 
+				printf ("%s %s", RST, RS);
+				return 0;
+			}
+			else 
+			{
+				categoria[cc].VT = categoria[cc].VT + categoria[cc].itens[ci].VU * categoria[cc].itens[ci].Q; // Atribui o Valor Total da Categoria
+				ci++;
+			}
+		}
+		VT=categoria[cc].VT + VT; // Atribui Valor Total da Compra
+		TI=categoria[cc].NI + TI; // Atribui o Total de Itens da Compra
+		cc++;
+		ci=0;
+	}
+	cc=0;
+
+	scanf("%lf %c", &VD, &FP[0]); // Define o Valor de Desconto e sua Forma de Pagamento
+	if (VD<0 || VD>VT) // Valor de Desconto não pode ser menor do que 0  nem maior do que o Valor Total
+	{
+		printf("Valor de Desconto Inválido");
+		return 0;
+	}
+	if(FP[0] == 'A') // Caso a Forma de Pagamento seja à vista...
+	{
+		printf("Luiz Henrique Viras Nobre\nluizhviras@uol.com.br\n\n");
+		while(cc<NuC)// Repetirá enquanto a Variável de Controle de Categoria for menor ao próprio Número de Categorias, sendo a variável igual a de entrada
+		{
+			printf("%s\n", categoria[cc].NC); // Imprime na tela Nome da Categoria
+			while (ci < categoria[cc].NI) // Repetirá enquanto a Variável Controle de Itens for menor ao próprio Número de Itens de cada Categoria, sendo a variável igual a de entrada
+			{
+				printf("* %s: R$ %.2f (%.1f %s)\n",categoria[cc].itens[ci].D, categoria[cc].itens[ci].Q*categoria[cc].itens[ci].VU,categoria[cc].itens[ci].VU, categoria[cc].itens[ci].UM);  // Imprime na tela Descrição, Valor Total de cada Item e dentro do parenteses imprime o Valor Unitário e sua Unidade de Medida de cada Item
+					ci++;
+				}
+				printf("** TOTAL %s: R$ %.2f\n\n", categoria[cc].NC, categoria[cc].VT); // Imprime o Valor Total de cada Categoria
+				cc++;
+				ci=0;
+			}
+			printf("TOTAL DE ITENS: %d\n\n", TI); // Imprime na tela o Total de Itens da compra
+			printf("VALOR TOTAL: R$ %.2f\n\n", VT); // Imprime na tela o Valor Total da compra
+			printf("DESCONTO: %.2f%%\n\n", 100*VD/VT); // Imprime na tela o Desconto em porcentagem referente ao Valor Total da compra
+			printf("VALOR DO DESCONTO: R$ %.2f\n\n", VD); // Imprime na tela o Valor Nominal do Desconto referente ao Valor Total da compra
+			printf("VALOR A PAGAR: R$ %.2f\n", VT-VD); // Imprime na tela o Valor Final a ser pago
+	}
+			else if (FP[0] == 'P') // Caso a Forma de Pagamento seja Parcelada...
+		{
+			scanf(" %s %lf", RS, &VM); // Define o Valor Mínimo das Parcelas
+			if (VM<0 || VM>=100)
+			{
+				printf ("Valor Mínimo da Parcela Inválido");
+				return 0;
+			}
+			printf("Luiz Henrique Viras Nobre\nluizhviras@uol.com.br\n\n");
+			while(cc<NuC)// Repetirá enquanto a Variável de Controle de Categoria for menor ao próprio Número de Categorias, sendo a variável igual a de entrada
+			{
+				printf("%s\n", categoria[cc].NC); // Imprime na tela Nome da Categoria
+				while (ci < categoria[cc].NI) // Repetirá enquanto a Variável Controle de Itens for menor ao próprio Número de Itens de cada Categoria, sendo a variável igual a de entrada
+				{
+					printf("* %s: R$ %.2f (%.1f %s)\n",categoria[cc].itens[ci].D, categoria[cc].itens[ci].Q*categoria[cc].itens[ci].VU,categoria[cc].itens[ci].VU, categoria[cc].itens[ci].UM);  // Imprime na tela Descrição, Valor Total de cada Item e dentro do parenteses imprime o Valor Unitário e sua Unidade de Medida de cada Item
+					ci++;
+				}
+				printf("** TOTAL %s: R$ %.2f\n\n", categoria[cc].NC, categoria[cc].VT); // Imprime o Valor Total de cada Categoria
+				cc++;
+				ci=0;
+			}
+			printf("TOTAL DE ITENS: %d\n\n", TI); // Imprime na tela o Total de Itens da compra
+			printf("VALOR TOTAL: R$ %.2f\n\n", VT); // Imprime na tela o Valor Total da compra
+			printf("DESCONTO: %.2f%%\n\n", 100*VD/VT); // Imprime na tela o Desconto em porcentagem referente ao Valor Total da compra
+			printf("VALOR DO DESCONTO: R$ %.2f\n\n", VD); // Imprime na tela o Valor Nominal do Desconto referente ao Valor Total da compra
+			printf("VALOR A PAGAR: R$ %.2f\n", VT-VD); // Imprime na tela o Valor Final a ser pago
+			VP = (VT-VD)/VM; // Imprime na tela o Valor da Parcela referente ao Valor Final a ser pago
+			printf("PARCELAS: %d", VP); // Imprime na tela o Número de Parcelas Máximo
+			printf("VALOR DAS PARCELAS: R$ %.2f", (VT-VD)/VP); // Imprime na tela o Valor Nominal das Parcelas
+		}
+		else // Caso a Forma de Pagamento não seja nenhuma das duas...
+		{
+		printf("Método de pagamento inválido.\n");
+		}
+		return 0;
+}
